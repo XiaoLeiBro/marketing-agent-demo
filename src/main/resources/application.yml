@@ -1,6 +1,6 @@
 spring:
   application:
-    name: marketing-agent-showcase
+    name: marketing-agent-demo
 
 server:
   port: 8080
