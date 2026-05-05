@@ -11,7 +11,7 @@ import cc.utime.marketingagent.domain.DraftResult;
 import cc.utime.marketingagent.domain.StockInfo;
 import cc.utime.marketingagent.domain.ToolCall;
 import cc.utime.marketingagent.domain.ValidationIssue;
-import cc.utime.marketingagent.parser.RequirementParser;
+import cc.utime.marketingagent.parser.CampaignIntentParser;
 import cc.utime.marketingagent.rag.KnowledgeBase;
 import cc.utime.marketingagent.tool.MarketingToolbox;
 import cc.utime.marketingagent.trace.TraceRepository;
@@ -26,14 +26,14 @@ import org.springframework.util.StringUtils;
 @Service
 public class MarketingAgentService {
 
-  private final RequirementParser requirementParser;
+  private final CampaignIntentParser requirementParser;
   private final KnowledgeBase knowledgeBase;
   private final MarketingToolbox marketingToolbox;
   private final CampaignPolicyValidator policyValidator;
   private final TraceRepository traceRepository;
 
   public MarketingAgentService(
-      RequirementParser requirementParser,
+      CampaignIntentParser requirementParser,
       KnowledgeBase knowledgeBase,
       MarketingToolbox marketingToolbox,
       CampaignPolicyValidator policyValidator,

@@ -2,6 +2,7 @@ package cc.utime.marketingagent.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import cc.utime.marketingagent.parser.CampaignIntentParser;
 import cc.utime.marketingagent.parser.RequirementParser;
 import cc.utime.marketingagent.rag.InMemoryKnowledgeBase;
 import cc.utime.marketingagent.tool.MarketingToolbox;
@@ -15,9 +16,11 @@ import org.junit.jupiter.api.Test;
 class MarketingAgentServiceTest {
 
   private final InMemoryTraceRepository traceRepository = new InMemoryTraceRepository();
+  private final CampaignIntentParser parser =
+      new RequirementParser(Clock.fixed(Instant.parse("2026-05-05T00:00:00Z"), ZoneId.of("Asia/Shanghai")));
   private final MarketingAgentService service =
       new MarketingAgentService(
-          new RequirementParser(Clock.fixed(Instant.parse("2026-05-05T00:00:00Z"), ZoneId.of("Asia/Shanghai"))),
+          this.parser,
           new InMemoryKnowledgeBase(),
           new MarketingToolbox(),
           new CampaignPolicyValidator(),

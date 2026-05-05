@@ -1,6 +1,11 @@
 spring:
   application:
     name: marketing-agent-demo
+  ai:
+    dashscope:
+      # 项目默认不启用 DashScope 自动装配，避免没有 API Key 时影响开箱运行。
+      # Spring AI 接入由 agent.llm.enabled 控制，并在 SpringAiConfig 中手动创建 ChatClient。
+      enabled: false
 
 server:
   port: 8080
@@ -15,3 +20,12 @@ management:
     web:
       exposure:
         include: health,info
+
+agent:
+  llm:
+    # 默认关闭，保证项目无需真实 API Key 也能运行。
+    # 启用后 RequirementParser 会切换为 Spring AI ChatClient 结构化解析。
+    enabled: false
+    dashscope:
+      model: qwen-plus
+      api-key: ${DASHSCOPE_API_KEY:}
