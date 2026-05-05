@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: marketing-agent-showcase
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
