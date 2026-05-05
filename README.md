@@ -1,4 +1,4 @@
-# Marketing Agent Showcase
+# Marketing Agent Demo
 
 一个面向 Java 后端面试展示的“营销活动配置 Agent”原型项目。
 
