@@ -5,6 +5,7 @@ import cc.utime.marketingagent.domain.AgentTrace;
 import cc.utime.marketingagent.domain.CampaignSample;
 import cc.utime.marketingagent.domain.CreateDraftRequest;
 import cc.utime.marketingagent.domain.CreateDraftResponse;
+import cc.utime.marketingagent.domain.DraftResult;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,21 @@ public class MarketingAgentController {
   @PostMapping("/drafts")
   public CreateDraftResponse createDraft(@RequestBody @Valid CreateDraftRequest request) {
     return this.marketingAgentService.createDraft(request.requirement());
+  }
+
+  @PostMapping("/traces/{traceId}/approve")
+  public DraftResult approveDraft(@PathVariable String traceId) {
+    return this.marketingAgentService.approveDraft(traceId);
+  }
+
+  @PostMapping("/campaigns/{draftId}/confirm")
+  public DraftResult confirmCampaign(@PathVariable String draftId) {
+    return this.marketingAgentService.confirmCampaign(draftId);
+  }
+
+  @PostMapping("/campaigns/{draftId}/activate")
+  public DraftResult activateCampaign(@PathVariable String draftId) {
+    return this.marketingAgentService.activateCampaign(draftId);
   }
 
   @GetMapping("/traces/{traceId}")

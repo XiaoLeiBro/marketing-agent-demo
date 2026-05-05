@@ -41,6 +41,14 @@ public class MarketingToolbox {
   }
 
   public DraftResult createCampaignDraft(CampaignDraft draft) {
-    return new DraftResult("DRAFT-" + UUID.randomUUID().toString().substring(0, 8), "PENDING_APPROVAL");
+    return new DraftResult("DRAFT-" + UUID.randomUUID().toString().substring(0, 8), "DRAFT");
+  }
+
+  public DraftResult confirmCampaign(String draftId) {
+    return new DraftResult(draftId, "PENDING_EFFECTIVE");
+  }
+
+  public DraftResult activateCampaign(String draftId) {
+    return new DraftResult(draftId, "EFFECTIVE");
   }
 }

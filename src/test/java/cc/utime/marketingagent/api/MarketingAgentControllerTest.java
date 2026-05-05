@@ -7,12 +7,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cc.utime.marketingagent.MarketingAgentApplication;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest(classes = MarketingAgentApplication.class)
 @AutoConfigureMockMvc
@@ -28,9 +30,34 @@ class MarketingAgentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"requirement\":\"福建新用户满30减5预算10万\"}"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("PENDING_APPROVAL"))
+        .andExpect(jsonPath("$.status").value("PENDING_REVIEW"))
         .andExpect(jsonPath("$.draft.region").value("福建"))
         .andExpect(jsonPath("$.draft.couponRule").value("满30减5"));
+  }
+
+  @Test
+  void shouldApproveConfirmAndActivateByApi() throws Exception {
+    MvcResult draftResult = this.mockMvc.perform(
+            post("/api/marketing-agent/drafts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"requirement\":\"福建新用户满30减5预算10万\"}"))
+        .andExpect(status().isOk())
+        .andReturn();
+    String traceId = JsonPath.read(draftResult.getResponse().getContentAsString(), "$.traceId");
+
+    MvcResult approveResult = this.mockMvc.perform(post("/api/marketing-agent/traces/{traceId}/approve", traceId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("DRAFT"))
+        .andReturn();
+    String draftId = JsonPath.read(approveResult.getResponse().getContentAsString(), "$.draftId");
+
+    this.mockMvc.perform(post("/api/marketing-agent/campaigns/{draftId}/confirm", draftId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("PENDING_EFFECTIVE"));
+
+    this.mockMvc.perform(post("/api/marketing-agent/campaigns/{draftId}/activate", draftId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("EFFECTIVE"));
   }
 
   @Test

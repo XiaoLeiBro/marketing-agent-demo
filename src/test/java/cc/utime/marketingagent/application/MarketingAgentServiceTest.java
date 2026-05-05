@@ -32,12 +32,27 @@ class MarketingAgentServiceTest {
         this.service.createDraft(
             "下周五到下下周一，针对福建地区新用户，做一个满30减5的首单优惠券活动，预算10万，每人限领1张，分享给好友再送2元无门槛券");
 
-    assertThat(response.status()).isEqualTo("PENDING_APPROVAL");
+    assertThat(response.status()).isEqualTo("PENDING_REVIEW");
     assertThat(response.draft().region()).isEqualTo("福建");
     assertThat(response.draft().couponRule()).isEqualTo("满30减5");
     assertThat(response.toolCalls()).extracting("name")
-        .contains("searchSimilarCampaigns", "queryAudience", "queryStock", "checkTimeConflict", "createCampaignDraft");
+        .contains("searchSimilarCampaigns", "queryAudience", "queryStock", "checkTimeConflict");
+    assertThat(response.toolCalls()).extracting("name").doesNotContain("createCampaignDraft");
     assertThat(response.validationIssues()).anyMatch(issue -> issue.code().equals("MANUAL_APPROVAL_REQUIRED"));
+  }
+
+  @Test
+  void shouldApproveConfirmAndActivateCampaign() {
+    var response = this.service.createDraft("福建新用户满30减5预算10万");
+
+    var createdDraft = this.service.approveDraft(response.traceId());
+    assertThat(createdDraft.status()).isEqualTo("DRAFT");
+
+    var pendingEffective = this.service.confirmCampaign(createdDraft.draftId());
+    assertThat(pendingEffective.status()).isEqualTo("PENDING_EFFECTIVE");
+
+    var effective = this.service.activateCampaign(createdDraft.draftId());
+    assertThat(effective.status()).isEqualTo("EFFECTIVE");
   }
 
   @Test

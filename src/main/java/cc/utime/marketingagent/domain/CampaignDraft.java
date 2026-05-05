@@ -27,6 +27,6 @@ public record CampaignDraft(
         intent.endTime(),
         intent.shareRewardFen() > 0,
         intent.shareRewardFen(),
-        "PENDING_APPROVAL");
+        "PENDING_REVIEW");
   }
 }
