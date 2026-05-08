@@ -1,6 +1,7 @@
 package cc.utime.marketingagent.parser;
 
 import cc.utime.marketingagent.domain.CampaignIntent;
+import cc.utime.marketingagent.domain.IntentType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -49,6 +50,7 @@ public class SpringAiRequirementParser implements CampaignIntentParser {
     LocalDateTime endTime = startTime.plusDays(Math.max(1, intentJson.durationDays()));
     String audienceLabel = intentJson.audienceLabel() == null ? "目标用户" : intentJson.audienceLabel();
     return new CampaignIntent(
+        defaultIntentType(intentJson.intentType()),
         defaultString(intentJson.region(), "全国"),
         audienceLabel,
         List.of(audienceLabel),
@@ -65,6 +67,7 @@ public class SpringAiRequirementParser implements CampaignIntentParser {
         你是营销中台活动配置助手。请把用户自然语言需求解析成严格 JSON。
         不要输出 Markdown，不要解释，只输出 JSON。
         字段：
+        - intentType: 固定枚举 CREATE_ACTIVITY、CHECK_ACTIVITY、QUERY_ACTIVITY、RULE_QA
         - region: 地区，例如 福建、浙江、上海、全国
         - audienceLabel: 人群标签，例如 新用户、目标用户
         - couponRule: 券规则，例如 满30减5、无门槛2元；不确定时填 待补充券规则
@@ -87,7 +90,17 @@ public class SpringAiRequirementParser implements CampaignIntentParser {
     return value == null || value.isBlank() ? defaultValue : value;
   }
 
+  private IntentType defaultIntentType(String value) {
+    try {
+      return value == null || value.isBlank() ? IntentType.CREATE_ACTIVITY : IntentType.valueOf(value);
+    }
+    catch (IllegalArgumentException ignored) {
+      return IntentType.CREATE_ACTIVITY;
+    }
+  }
+
   private record IntentJson(
+      String intentType,
       String region,
       String audienceLabel,
       String couponRule,

@@ -1,6 +1,7 @@
 package cc.utime.marketingagent.parser;
 
 import cc.utime.marketingagent.domain.CampaignIntent;
+import cc.utime.marketingagent.domain.IntentType;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class RequirementParser implements CampaignIntentParser {
 
   @Override
   public CampaignIntent parse(String requirement) {
+    IntentType intentType = resolveIntentType(requirement);
     String region = resolveRegion(requirement);
     String audienceLabel = requirement.contains("新用户") || requirement.contains("新客") ? "新用户" : "目标用户";
     String couponRule = resolveCouponRule(requirement);
@@ -35,6 +37,7 @@ public class RequirementParser implements CampaignIntentParser {
     LocalDateTime startTime = LocalDateTime.of(startDate, LocalTime.of(10, 0));
     LocalDateTime endTime = startTime.plusDays(4);
     return new CampaignIntent(
+        intentType,
         region,
         audienceLabel,
         List.of(audienceLabel),
@@ -44,6 +47,19 @@ public class RequirementParser implements CampaignIntentParser {
         startTime,
         endTime,
         shareRewardFen);
+  }
+
+  private IntentType resolveIntentType(String requirement) {
+    if (requirement.contains("规则") || requirement.contains("怎么配置") || requirement.contains("为什么")) {
+      return IntentType.RULE_QA;
+    }
+    if (requirement.contains("查询") || requirement.contains("库存多少") || requirement.contains("预算还有")) {
+      return IntentType.QUERY_ACTIVITY;
+    }
+    if (requirement.contains("检查") || requirement.contains("校验") || requirement.contains("有没有问题")) {
+      return IntentType.CHECK_ACTIVITY;
+    }
+    return IntentType.CREATE_ACTIVITY;
   }
 
   private String resolveRegion(String requirement) {

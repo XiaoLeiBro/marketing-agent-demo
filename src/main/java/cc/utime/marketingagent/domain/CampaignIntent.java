@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CampaignIntent(
+    IntentType intentType,
     String region,
     String audienceLabel,
     List<String> audienceTags,

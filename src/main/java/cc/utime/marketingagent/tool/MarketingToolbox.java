@@ -13,6 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MarketingToolbox {
 
+  /*
+   * Tool Calling 模拟层。
+   *
+   * 面试时重点讲：这里不是把业务接口裸露给模型，而是后端包装后的白名单工具。
+   * queryAudience/queryStock/checkTimeConflict 是只读工具，可以被 Agent 编排调用；
+   * createCampaignDraft/confirmCampaign/activateCampaign 是写操作，只能在人工审批后的应用服务方法里调用。
+   */
   public AudienceInfo queryAudience(List<String> tags, String region) {
     boolean newUser = tags.stream().anyMatch(tag -> tag.contains("新用户") || tag.contains("新客"));
     long estimatedUsers = newUser ? 180_000L : 500_000L;
@@ -41,6 +48,8 @@ public class MarketingToolbox {
   }
 
   public DraftResult createCampaignDraft(CampaignDraft draft) {
+    // 真实生产中这里会调用营销中台“创建草稿”接口，并由营销中台负责事务、权限和审计。
+    // Demo 只返回 DRAFT 状态，用来表达“审批通过后仍然不是直接上线”。
     return new DraftResult("DRAFT-" + UUID.randomUUID().toString().substring(0, 8), "DRAFT");
   }
 

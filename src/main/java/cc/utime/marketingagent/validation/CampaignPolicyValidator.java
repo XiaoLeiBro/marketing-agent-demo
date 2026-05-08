@@ -12,6 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class CampaignPolicyValidator {
 
+  /*
+   * 业务规则链。
+   *
+   * 面试文档强调：资损类、库存类、预算类判断不能交给 LLM 做最终裁决。
+   * 所以这里用确定性代码返回 blocker/warning：
+   * - blocker：不能进入审批或创建草稿；
+   * - warning：允许进入人工审批，但审批人必须看到风险提示。
+   */
   private static final int APPROVAL_THRESHOLD_FEN = 50_000 * 100;
 
   public List<ValidationIssue> validate(
